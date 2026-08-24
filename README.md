@@ -1,137 +1,328 @@
 # Panorama Stitcher
 
-A Python computer-vision project that creates panoramic images by detecting and matching visual features across overlapping photographs. It includes a manual SIFT/FLANN/RANSAC stitching pipeline, OpenCV's automatic panorama stitcher, and utilities for visualizing keypoints and feature matches.
+A Python computer-vision application that automatically creates panoramic images from overlapping photographs. The project implements a **manual image-stitching pipeline using SIFT, FLANN, homography estimation, and RANSAC**, along with an alternative implementation using OpenCV's built-in panorama stitcher.
 
-## Repository title
+The project also generates visualizations of detected keypoints, feature matches, and RANSAC inliers to demonstrate how the images are aligned.
 
-**Panorama Stitcher**
+## ✨ Features
 
-Suggested repository name: `panorama-stitcher`
+* 🔍 **SIFT Feature Detection** — Detects distinctive keypoints and extracts feature descriptors.
+* 🔗 **FLANN Feature Matching** — Efficiently matches features between overlapping images.
+* 🎯 **Lowe's Ratio Test** — Filters out unreliable and ambiguous feature matches.
+* 📐 **Homography Estimation** — Determines the geometric transformation between images.
+* 🛡️ **RANSAC** — Removes outlier matches and produces a more reliable homography.
+* 🖼️ **Image Warping & Stitching** — Aligns images onto a common canvas to create a panorama.
+* ✂️ **Automatic Cropping** — Removes unnecessary black borders from the final panorama.
+* 📊 **Visualizations** — Generates keypoint, feature-match, and inlier visualizations.
+* ⚡ **Automatic Stitching** — Includes an alternative implementation using OpenCV's `Stitcher` class.
 
-## Features
+---
 
-- Detects image features with SIFT.
-- Matches descriptors with a FLANN-based matcher.
-- Filters matches with Lowe's ratio test.
-- Estimates image alignment using a RANSAC homography.
-- Warps and blends images into a panorama.
-- Crops black borders from stitched output.
-- Saves keypoint, match, and inlier visualizations.
-- Provides an automatic stitching option through OpenCV's `Stitcher` class.
+## 🧠 How It Works
 
-## Project structure
+The manual stitching pipeline follows these main steps:
 
 ```text
-.
-├── main.py              # Runs the manual pairwise stitching pipeline
-├── stitcher.py          # ImageStitcher implementation
-├── sticher_auto.py      # Automatic OpenCV stitching pipeline
-├── visualize.py         # Keypoint and match visualization helpers
-├── requirements.txt     # Python dependencies
-├── images/              # Input images; add this directory locally
-└── output/              # Generated panoramas and visualizations
+Input Images
+     │
+     ▼
+SIFT Feature Detection
+     │
+     ▼
+Feature Descriptors
+     │
+     ▼
+FLANN Feature Matching
+     │
+     ▼
+Lowe's Ratio Test
+     │
+     ▼
+RANSAC Homography Estimation
+     │
+     ▼
+Image Warping
+     │
+     ▼
+Image Blending
+     │
+     ▼
+Black Border Cropping
+     │
+     ▼
+Final Panorama
 ```
 
-## Requirements
+### 1. Feature Detection
 
-- Python 3.8 or newer
-- OpenCV
-- NumPy
-- A sequence of overlapping images, ordered from left to right
+SIFT (**Scale-Invariant Feature Transform**) detects distinctive points in each image and generates descriptors that can be used to identify the same features across different photographs.
 
-Install the dependencies with:
+### 2. Feature Matching
+
+A **FLANN-based matcher** compares descriptors between overlapping images to find potential corresponding features.
+
+### 3. Ratio Test
+
+Lowe's ratio test filters out ambiguous matches by comparing the distance between the best and second-best matches.
+
+### 4. Homography Estimation
+
+The remaining matches are used to calculate a **homography matrix**, which describes how one image should be transformed to align with another.
+
+### 5. RANSAC
+
+**RANSAC** identifies and removes incorrect feature matches (outliers), resulting in a more reliable homography.
+
+### 6. Warping and Stitching
+
+The images are warped onto a shared canvas and combined to produce a single panoramic image.
+
+### 7. Cropping
+
+Black regions created during image warping are detected and removed from the final panorama.
+
+---
+
+## 📂 Project Structure
+
+```text
+panorama-stitcher/
+│
+├── main.py                 # Runs the manual pairwise stitching pipeline
+├── stitcher.py             # ImageStitcher implementation
+├── sticher_auto.py         # Automatic OpenCV stitching pipeline
+├── visualize.py            # Keypoint and feature-match visualization
+├── requirements.txt        # Python dependencies
+│
+├── images/                 # Input images
+│
+└── output/                 # Generated panoramas and visualizations
+```
+
+> **Note:** `sticher_auto.py` is the current filename in the project. For consistency, it could be renamed to `stitcher_auto.py`.
+
+---
+
+## 🛠️ Technologies
+
+* **Python**
+* **OpenCV**
+* **NumPy**
+* **SIFT**
+* **FLANN**
+* **RANSAC**
+* **Homography**
+
+---
+
+## 📋 Requirements
+
+* Python **3.8+**
+* OpenCV
+* NumPy
+* A sequence of overlapping photographs
+
+Install the required dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-## How to run
+---
 
-### 1. Set up the environment
+## 🚀 Getting Started
+
+### 1. Clone the repository
 
 ```bash
-# Clone the repository
 git clone https://github.com/YOUR_USERNAME/panorama-stitcher.git
 cd panorama-stitcher
+```
 
-# (Optional) Create a virtual environment
+### 2. Create a virtual environment
+
+Creating a virtual environment is recommended:
+
+**Windows:**
+
+```bash
 python -m venv venv
-source venv/bin/activate          # macOS/Linux
-venv\Scripts\activate             # Windows
+venv\Scripts\activate
+```
 
-# Install dependencies
+**macOS/Linux:**
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
 python -m pip install -r requirements.txt
 ```
 
-### 2. Prepare input images
+---
 
-Create an `images` directory and add your overlapping photos:
+## 🖼️ Input Images
 
-```bash
-mkdir -p images
-```
-
-Place your images in `images/` and update the filenames in the scripts as needed. The current `main.py` expects:
-
-```text
-images/IMG_2740.jpg
-images/IMG_2741.jpg
-images/IMG_2742.jpg
-images/img4.jpg
-images/img5.jpg
-images/img6.jpg
-```
-
-The automatic script (`sticher_auto.py`) expects:
-
-```text
-images/1.jpg
-images/2.jpg
-images/3.jpg
-```
-
-### 3. Create the output directory
+Create an `images` directory:
 
 ```bash
-mkdir -p output
+mkdir images
 ```
 
-### 4. Run the manual stitching pipeline
+Place your overlapping photographs inside the directory.
+
+The current manual pipeline expects:
+
+```text
+images/
+├── IMG_2740.jpg
+├── IMG_2741.jpg
+├── IMG_2742.jpg
+├── img4.jpg
+├── img5.jpg
+└── img6.jpg
+```
+
+The images should be:
+
+* Taken with sufficient overlap.
+* Ordered from **left to right**.
+* Similar enough for SIFT to identify common features.
+
+### Automatic Stitching
+
+The automatic OpenCV pipeline currently expects:
+
+```text
+images/
+├── 1.jpg
+├── 2.jpg
+└── 3.jpg
+```
+
+Update the image paths in the script if you want to use different filenames.
+
+---
+
+## ▶️ Running the Project
+
+### Manual Stitching Pipeline
+
+Run:
 
 ```bash
 python main.py
 ```
 
-Outputs:
+The manual pipeline processes the images pairwise and generates panoramic results.
 
-- `output/final_panorama123.png`
-- `output/final_panorama456.png`
-- Keypoint, match, and inlier visualizations for each step.
+Example outputs:
 
-### 5. Run the automatic stitching pipeline
+```text
+output/
+├── final_panorama123.png
+├── final_panorama456.png
+└── ...
+```
 
-Edit `sticher_auto.py` if you want to change the input image paths, then run:
+It also generates visualizations showing:
+
+* SIFT keypoints
+* Feature matches
+* RANSAC inliers
+* Intermediate stitching results
+
+### Automatic Stitching
+
+OpenCV's built-in panorama stitcher can be run with:
 
 ```bash
 python sticher_auto.py
 ```
 
-Output:
+The resulting panorama is saved as:
 
-- `output/final_auto_panorama.png`
+```text
+output/final_auto_panorama.png
+```
 
-## Important notes
+---
 
-- Images must overlap sufficiently for reliable feature matching.
-- Input images should be ordered from left to right.
-- The manual pipeline currently checks that the first three images load successfully; verify all six paths before running both sequences.
-- The automatic script filename is `sticher_auto.py` as currently provided; consider renaming it to `stitcher_auto.py` for consistency.
+## 📊 Output Visualizations
 
-## How it works
+The project generates visualizations to help understand the computer-vision pipeline.
 
-1. SIFT detects keypoints and computes descriptors in each image.
-2. FLANN finds candidate descriptor matches.
-3. Lowe's ratio test removes ambiguous matches.
-4. RANSAC estimates a homography between the images.
-5. The second image is warped onto a larger canvas.
-6. The images are blended and black borders are cropped.
+### Keypoints
+
+Shows the features detected by SIFT in each image.
+
+### Feature Matches
+
+Displays corresponding features identified between overlapping images.
+
+### RANSAC Inliers
+
+Shows the matches that were considered reliable when calculating the homography.
+
+These visualizations make it easier to evaluate how successfully the images are being aligned.
+
+---
+
+## ⚠️ Important Notes
+
+* Input photographs need sufficient overlap for successful feature matching.
+* Images should generally be captured from a similar viewpoint.
+* Input images should be ordered from left to right.
+* Poor lighting, motion blur, or large changes in viewpoint can reduce matching accuracy.
+* The manual pipeline currently uses specific image filenames, so update the paths in `main.py` when using different images.
+* Make sure the `output/` directory exists before running the scripts if it is not created automatically.
+
+---
+
+## 🎯 Project Objective
+
+The goal of this project was to explore fundamental **computer-vision techniques for panoramic image generation** by implementing the major steps of an image-stitching pipeline rather than relying solely on a pre-built panorama solution.
+
+The project demonstrates practical applications of:
+
+* Feature detection
+* Feature description
+* Feature matching
+* Outlier rejection
+* Homography estimation
+* Perspective transformation
+* Image stitching
+
+---
+
+## 🔮 Future Improvements
+
+Potential improvements include:
+
+* Automatically detecting and loading images from the `images/` directory.
+* Supporting an arbitrary number of input images.
+* Automatically ordering images based on feature overlap.
+* Improving seam blending between images.
+* Adding a graphical user interface.
+* Adding command-line arguments for input/output directories.
+* Renaming `sticher_auto.py` to `stitcher_auto.py`.
+* Adding automated tests for the stitching pipeline.
+
+---
+
+## 👤 Author
+
+**Chanuth Pathirana**
+
+Computer Engineering — Software Engineering
+Toronto Metropolitan University
+
+---
+
+## 📄 License
+
+This project was developed as an academic/portfolio project.
